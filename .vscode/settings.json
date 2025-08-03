@@ -1,3 +1,6 @@
 {
   "cSpell.words": ["creator", "playground"],
+  "[typescript]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  }
 }

@@ -8,7 +8,7 @@ export default defineConfig(() => {
      * base: 静态资源的公共路径
      */
     root: "./src/playground",
-    base: "./src/playground",
+    base: "/src/playground",
     build: {
       lib: {
         entry: "src/index.ts",
