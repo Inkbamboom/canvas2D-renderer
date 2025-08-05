@@ -1,12 +1,19 @@
+import { getElementTrulySize } from "../utils/dom/elementSize";
+
 export class Graph {
   container: HTMLElement;
   graphElement!: HTMLCanvasElement;
   graphContext!: CanvasRenderingContext2D;
+  resizeObserver: ResizeObserver;
   constructor(container: HTMLElement) {
     if (!container || !(container instanceof HTMLElement)) {
       throw new Error("必须传入一个有效的 HTML 容器元素");
     }
     this.container = container;
+    this.resizeObserver = new ResizeObserver(
+      this.resizeObserverCallback.bind(this),
+    );
+    this.resizeObserver.observe(this.container);
     this.createGraph();
   }
 
@@ -17,31 +24,43 @@ export class Graph {
     this.graphElement = document.createElement("canvas");
     this.graphElement.style.display = "block"; // 设置画布为块级元素
     this.graphContext = this.graphElement.getContext("2d")!;
-    this.graphElement.width = this.getContainerSize().width; // 设置画布宽度
-    this.graphElement.height = this.getContainerSize().height; // 设置画布高度
+    this.graphElement.width = getElementTrulySize(this.container).width; // 设置画布宽度
+    this.graphElement.height = getElementTrulySize(this.container).height; // 设置画布高度
     this.container.appendChild(this.graphElement);
-    this.graphContext.fillStyle = "blue";
-    this.graphContext.fillRect(0, 0, 100, 100);
-    this.graphContext.fillRect(200, 0, 100, 100);
-    this.graphContext.save();
-
-    setTimeout(() => {
-      this.graphContext.clearRect(
-        0,
-        0,
-        this.graphElement.width,
-        this.graphElement.height,
-      );
-      this.graphContext.translate(500, 500);
-      this.graphContext.restore();
-    }, 2000);
   }
 
-  getContainerSize() {
-    const rect = this.container.getBoundingClientRect();
-    return {
-      width: rect.width,
-      height: rect.height,
-    };
+  /**
+   * @function resizeObserver回调
+   * @param entries
+   * @param _observer
+   */
+  resizeObserverCallback(
+    entries: ResizeObserverEntry[],
+    _observer: ResizeObserver,
+  ) {
+    for (const entry of entries) {
+      console.log(entry.contentRect, "rect");
+      this.graphElement.width = entry.contentRect.width;
+      this.graphElement.height = entry.contentRect.height;
+      // 每次canvas宽高发生变化之后会导致上下文重置，需要重新渲染
+      this.draw();
+    }
+  }
+
+  draw() {
+    for (let i = 0; i < 1000; i++) {
+      this.graphContext.beginPath();
+      if (i % 2 === 0) {
+        this.graphContext.strokeStyle = "red";
+        this.graphContext.lineWidth = 1;
+        this.graphContext.rect(i * 10, i * 10, 10, 10);
+        this.graphContext.stroke();
+      } else {
+        this.graphContext.strokeStyle = "green";
+        this.graphContext.lineWidth = 5;
+        this.graphContext.rect(i * 10, i * 10, 10, 10);
+        this.graphContext.stroke();
+      }
+    }
   }
 }
