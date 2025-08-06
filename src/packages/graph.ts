@@ -48,15 +48,21 @@ export class Graph {
       this.graphElement.width = entry.contentRect.width;
       this.graphElement.height = entry.contentRect.height;
       // 每次canvas宽高发生变化之后会导致上下文重置，需要重新渲染
-      this.draw();
+      this.draw(true);
     }
   }
 
   /**
    * @function 绘制
+   * @param isClearContext 是否清除上下文
+   * @description
+   * 正常情况下canvas的translate会自动累计而不需要手动累加
+   * 如果是变换尺寸这类会清除上下文的操作需要计算所有的变换
    */
-  draw() {
-    this.graphContext.translate(this.coordTranslate.x, this.coordTranslate.y);
+  draw(isClearContext: boolean = false) {
+    if (isClearContext) {
+      this.graphContext.translate(this.coordTranslate.x, this.coordTranslate.y);
+    }
     for (let i = 0; i < 1000; i++) {
       this.graphContext.beginPath();
       if (i % 2 === 0) {
@@ -78,25 +84,29 @@ export class Graph {
     let startMousePosition = { x: 0, y: 0 };
     let isStart = false;
     this.graphElement.addEventListener("mousedown", (e) => {
-      console.log(e.button);
       if (e.button === 0) isStart = true;
       startMousePosition.x = e.clientX;
       startMousePosition.y = e.clientY;
     });
 
     this.graphElement.addEventListener("mousemove", (e) => {
-      console.log(isStart);
       if (!isStart) return;
+      const changeX = e.clientX - startMousePosition.x;
+      const changeY = e.clientY - startMousePosition.y;
+      startMousePosition.x = e.clientX;
+      startMousePosition.y = e.clientY;
+      this.coordTranslate.x += changeX;
+      this.coordTranslate.y += changeY;
+      this.graphContext.translate(changeX, changeY);
+      /**
+       * 只要清理可视区域即可
+       */
       this.graphContext.clearRect(
-        0,
-        0,
+        -this.coordTranslate.x,
+        -this.coordTranslate.y,
         this.graphElement.width,
         this.graphElement.height,
       );
-      const changeX = e.clientX - startMousePosition.x;
-      const changeY = e.clientY - startMousePosition.y;
-      this.coordTranslate.x += changeX;
-      this.coordTranslate.y += changeY;
       this.draw();
     });
 
