@@ -5,6 +5,10 @@ export class Graph {
   graphElement!: HTMLCanvasElement;
   graphContext!: CanvasRenderingContext2D;
   resizeObserver: ResizeObserver;
+  /**
+   * 画布平移变换
+   */
+  coordTranslate = { x: 0, y: 0 };
   constructor(container: HTMLElement) {
     if (!container || !(container instanceof HTMLElement)) {
       throw new Error("必须传入一个有效的 HTML 容器元素");
@@ -15,6 +19,7 @@ export class Graph {
     );
     this.resizeObserver.observe(this.container);
     this.createGraph();
+    this.eventRegister();
   }
 
   /**
@@ -47,7 +52,11 @@ export class Graph {
     }
   }
 
+  /**
+   * @function 绘制
+   */
   draw() {
+    this.graphContext.translate(this.coordTranslate.x, this.coordTranslate.y);
     for (let i = 0; i < 1000; i++) {
       this.graphContext.beginPath();
       if (i % 2 === 0) {
@@ -62,5 +71,38 @@ export class Graph {
         this.graphContext.stroke();
       }
     }
+  }
+
+  eventRegister() {
+    if (!this.graphElement) return;
+    let startMousePosition = { x: 0, y: 0 };
+    let isStart = false;
+    this.graphElement.addEventListener("mousedown", (e) => {
+      console.log(e.button);
+      if (e.button === 0) isStart = true;
+      startMousePosition.x = e.clientX;
+      startMousePosition.y = e.clientY;
+    });
+
+    this.graphElement.addEventListener("mousemove", (e) => {
+      console.log(isStart);
+      if (!isStart) return;
+      this.graphContext.clearRect(
+        0,
+        0,
+        this.graphElement.width,
+        this.graphElement.height,
+      );
+      const changeX = e.clientX - startMousePosition.x;
+      const changeY = e.clientY - startMousePosition.y;
+      this.coordTranslate.x += changeX;
+      this.coordTranslate.y += changeY;
+      this.draw();
+    });
+
+    this.graphElement.addEventListener("mouseup", () => {
+      isStart = false;
+      startMousePosition = { x: 0, y: 0 };
+    });
   }
 }
