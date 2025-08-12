@@ -3,6 +3,10 @@
  */
 export class Drag {
   /**
+   * 拖拽触发目标元素
+   */
+  triggerTarget: HTMLElement;
+  /**
    * 鼠标初始位置
    */
   private mouseStartPosition: { x: number; y: number } = { x: 0, y: 0 };
@@ -51,13 +55,14 @@ export class Drag {
       onMouseup?: (e: MouseEvent) => void;
     },
   ) {
+    this.triggerTarget = triggerTarget;
     this.mousedownCallback = options.onMousedown || (() => {});
     this.mousemoveCallback = options.onMousemove || (() => {});
     this.mouseupCallback = options.onMouseup || (() => {});
     this.triggerJudgeFn = triggerJudgeFn;
-    triggerTarget.addEventListener("mousedown", this.onMousedown.bind(this));
-    triggerTarget.addEventListener("mousemove", this.onMousemove.bind(this));
-    triggerTarget.addEventListener("mouseup", this.onMouseup.bind(this));
+    window.addEventListener("mousedown", this.onMousedown.bind(this));
+    window.addEventListener("mousemove", this.onMousemove.bind(this));
+    window.addEventListener("mouseup", this.onMouseup.bind(this));
   }
 
   /**
@@ -73,6 +78,7 @@ export class Drag {
    * @param e 鼠标事件
    */
   onMousedown(e: MouseEvent) {
+    if (e.target !== this.triggerTarget) return;
     this.mouseStartPosition = { x: e.clientX, y: e.clientY };
     // 设置触发标识
     this.dragTrigger = this.triggerJudgeFn(e);
