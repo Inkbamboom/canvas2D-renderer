@@ -1,4 +1,5 @@
 import { getElementTrulySize } from "../utils/dom/elementSize";
+import { Drag } from "./drag";
 
 export class Graph {
   container: HTMLElement;
@@ -19,7 +20,7 @@ export class Graph {
     );
     this.resizeObserver.observe(this.container);
     this.createGraph();
-    this.eventRegister();
+    this.graphDrag();
   }
 
   /**
@@ -79,40 +80,35 @@ export class Graph {
     }
   }
 
-  eventRegister() {
+  /**
+   * @function 设置画布拖拽
+   * @returns
+   */
+  graphDrag() {
     if (!this.graphElement) return;
-    let startMousePosition = { x: 0, y: 0 };
-    let isStart = false;
-    this.graphElement.addEventListener("mousedown", (e) => {
-      if (e.button === 0) isStart = true;
-      startMousePosition.x = e.clientX;
-      startMousePosition.y = e.clientY;
-    });
-
-    this.graphElement.addEventListener("mousemove", (e) => {
-      if (!isStart) return;
-      const changeX = e.clientX - startMousePosition.x;
-      const changeY = e.clientY - startMousePosition.y;
-      startMousePosition.x = e.clientX;
-      startMousePosition.y = e.clientY;
-      this.coordTranslate.x += changeX;
-      this.coordTranslate.y += changeY;
-      this.graphContext.translate(changeX, changeY);
-      /**
-       * 只要清理可视区域即可
-       */
-      this.graphContext.clearRect(
-        -this.coordTranslate.x,
-        -this.coordTranslate.y,
-        this.graphElement.width,
-        this.graphElement.height,
-      );
-      this.draw();
-    });
-
-    this.graphElement.addEventListener("mouseup", () => {
-      isStart = false;
-      startMousePosition = { x: 0, y: 0 };
-    });
+    new Drag(
+      this.graphElement,
+      (e) => {
+        if (e.button !== 0) return false; // 只处理鼠标左键
+        return true; // 触发拖拽
+      },
+      {
+        onMousemove: (_e, changeX, changeY) => {
+          this.coordTranslate.x += changeX;
+          this.coordTranslate.y += changeY;
+          this.graphContext.translate(changeX, changeY);
+          /**
+           * 只要清理可视区域即可
+           */
+          this.graphContext.clearRect(
+            -this.coordTranslate.x,
+            -this.coordTranslate.y,
+            this.graphElement.width,
+            this.graphElement.height,
+          );
+          this.draw();
+        },
+      },
+    );
   }
 }
