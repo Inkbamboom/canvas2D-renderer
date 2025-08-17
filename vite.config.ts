@@ -19,8 +19,9 @@ export default defineConfig(() => {
         name: "flow-creator-tya",
         fileName: (format) => `my-library.${format}.js`,
       },
+      emptyOutDir: true,
     },
     server: {},
-    publicDir: "",
+    publicDir: path.resolve(__dirname, "public"),
   };
 });
