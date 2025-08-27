@@ -30,7 +30,6 @@ export class PaintElement {
   graph: Graph;
   private props: ElementProps;
   constructor(
-    canvasEl: HTMLCanvasElement,
     graph: Graph,
     options?: {
       shape?: string;
@@ -53,8 +52,8 @@ export class PaintElement {
     };
 
     this.options = { ...defaultOptions, ...options };
-    this.canvasElement = canvasEl;
-    this.ctx2D = canvasEl.getContext("2d")!;
+    this.canvasElement = this.graph.graphElement;
+    this.ctx2D = this.graph.graphContext;
     const path = new Path2D();
     path.rect(
       this.options.x,

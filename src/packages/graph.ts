@@ -1,7 +1,6 @@
 import { getElementTrulySize } from "../utils/dom/elementSize";
 import { Drag } from "./drag";
-import { PaintElement } from "./element";
-import { changeZIndex } from "./zIndex";
+
 import type { ElementProps } from "./element";
 
 export class Graph {
@@ -36,20 +35,6 @@ export class Graph {
     this.resizeObserver.observe(this.container);
     this.createGraph();
     this.graphDrag();
-
-    const node1 = new PaintElement(this.graphElement, this);
-    new PaintElement(this.graphElement, this, {
-      x: 200,
-      y: 200,
-      width: 100,
-      height: 100,
-      color: "red",
-    });
-
-    setTimeout(() => {
-      changeZIndex(this, node1.options.id, "up");
-      this.draw(true);
-    }, 2000);
   }
 
   /**
@@ -86,7 +71,6 @@ export class Graph {
     _observer: ResizeObserver,
   ) {
     for (const entry of entries) {
-      console.log(entry.contentRect, "rect");
       this.graphElement.width = entry.contentRect.width;
       this.graphElement.height = entry.contentRect.height;
       // 每次canvas宽高发生变化之后会导致上下文重置，需要重新渲染
