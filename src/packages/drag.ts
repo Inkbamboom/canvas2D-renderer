@@ -1,3 +1,26 @@
+type NormalCallbackFn = (...args: any[]) => void;
+
+const mousedownFnCollection: NormalCallbackFn[] = []; // 鼠标按下事件回调集合
+const mousemoveFnCollection: NormalCallbackFn[] = []; // 鼠标移动事件回调集合
+const mouseupFnCollection: NormalCallbackFn[] = []; // 鼠标松开事件回调集合
+
+window.addEventListener("mousedown", (e) => {
+  mousedownFnCollection.forEach((fn) => {
+    fn(e);
+  });
+});
+
+window.addEventListener("mousemove", (e) => {
+  mousemoveFnCollection.forEach((fn) => {
+    fn(e);
+  });
+});
+
+window.addEventListener("mouseup", (e) => {
+  mouseupFnCollection.forEach((fn) => {
+    fn(e);
+  });
+});
 /**
  * @class 通用拖拽逻辑
  */
@@ -60,9 +83,9 @@ export class Drag {
     this.mousemoveCallback = options.onMousemove || (() => {});
     this.mouseupCallback = options.onMouseup || (() => {});
     this.triggerJudgeFn = triggerJudgeFn;
-    window.addEventListener("mousedown", this.onMousedown.bind(this));
-    window.addEventListener("mousemove", this.onMousemove.bind(this));
-    window.addEventListener("mouseup", this.onMouseup.bind(this));
+    mousedownFnCollection.push(this.onMousedown.bind(this));
+    mousemoveFnCollection.push(this.onMousemove.bind(this));
+    mouseupFnCollection.push(this.onMouseup.bind(this));
   }
 
   /**
@@ -82,6 +105,7 @@ export class Drag {
     this.mouseStartPosition = { x: e.clientX, y: e.clientY };
     // 设置触发标识
     this.dragTrigger = this.triggerJudgeFn(e);
+    if (!this.dragTrigger) return;
     this.mousedownCallback(e);
   }
   /**
@@ -108,4 +132,6 @@ export class Drag {
     this.dragTrigger = false;
     this.mouseupCallback(_e);
   }
+
+  pauseDrag() {}
 }
