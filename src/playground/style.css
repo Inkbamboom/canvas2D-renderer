@@ -16,6 +16,26 @@ body {
   border: none;
 }
 
+#tools {
+  position: absolute;
+  width: 400px;
+  height: 50px;
+  background: #ffffff;
+  border: 1px solid #000000;
+  border-top: none;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  user-select: none;
+  display: flex;
+  padding: 10px;
+  align-items: center;
+}
+
+#tools > :nth-child(n) {
+  margin: 0 5px;
+}
+
 canvas {
   margin: 0;
   padding: 0;

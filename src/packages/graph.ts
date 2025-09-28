@@ -1,7 +1,9 @@
 import { getElementTrulySize } from "../utils/dom/elementSize";
 import { Drag } from "./drag";
 
-import type { ElementProps } from "./element";
+import type { PaintElement } from "./element";
+import { createSelectELement } from "./select";
+import { initWindowEventListener } from "./windowEventListener";
 
 export class Graph {
   container: HTMLElement;
@@ -11,7 +13,7 @@ export class Graph {
   /**
    * 元素合集
    */
-  elementsMap: Map<string, ElementProps> = new Map();
+  elementsMap: Map<string, PaintElement> = new Map();
   /**
    * 元素id数组，这里是用于z轴排序的
    */
@@ -35,6 +37,7 @@ export class Graph {
     this.resizeObserver.observe(this.container);
     this.createGraph();
     this.graphDrag();
+    initWindowEventListener(this);
   }
 
   /**
@@ -89,6 +92,7 @@ export class Graph {
     if (isClearContext) {
       this.graphContext.translate(this.coordTranslate.x, this.coordTranslate.y);
     }
+
     if (clearGraph) {
       /**
        * 只要清理可视区域即可
@@ -105,16 +109,22 @@ export class Graph {
     this.layerIds.forEach((elementId) => {
       this.graphContext.beginPath();
       const element = this.elementsMap.get(elementId)!;
-      this.graphContext.fillStyle = element.color;
+      const prop = element.getProp();
+      this.graphContext.fillStyle = prop.color;
       // 更新node的path放到绘制中执行保证图元信息是可json的格式
       /**
        * @description Path2D似乎是一个永久存在的上下文，
        * 如果你不引用新的实例会在修改参数后一直在原本的路径上添加导致绘制会包含所有的形状
        */
-      element.path = new Path2D();
-      element.path.rect(element.x, element.y, element.width, element.height);
-      this.graphContext.fill(element.path);
+      const path = new Path2D();
+      path.rect(prop.x, prop.y, prop.width, prop.height);
+      element.setProp("path", path, false);
+      this.graphContext.fill(path);
     });
+    // 为了保证选择框始终在最上层，因此放在最后绘制
+    if (this.selectionIds.length > 0) {
+      createSelectELement(this);
+    }
   }
 
   /**

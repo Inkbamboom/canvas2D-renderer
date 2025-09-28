@@ -1,26 +1,9 @@
-type NormalCallbackFn = (...args: any[]) => void;
+import {
+  mousedownFnCollection,
+  mousemoveFnCollection,
+  mouseupFnCollection,
+} from "./windowEventListener";
 
-const mousedownFnCollection: NormalCallbackFn[] = []; // 鼠标按下事件回调集合
-const mousemoveFnCollection: NormalCallbackFn[] = []; // 鼠标移动事件回调集合
-const mouseupFnCollection: NormalCallbackFn[] = []; // 鼠标松开事件回调集合
-
-window.addEventListener("mousedown", (e) => {
-  mousedownFnCollection.forEach((fn) => {
-    fn(e);
-  });
-});
-
-window.addEventListener("mousemove", (e) => {
-  mousemoveFnCollection.forEach((fn) => {
-    fn(e);
-  });
-});
-
-window.addEventListener("mouseup", (e) => {
-  mouseupFnCollection.forEach((fn) => {
-    fn(e);
-  });
-});
 /**
  * @class 通用拖拽逻辑
  */

@@ -4,15 +4,51 @@ import { v4 as uuidV4 } from "uuid";
 import { selectElement } from "./select";
 
 export interface ElementProps {
+  /**
+   * 元素id
+   */
   id: string;
+  /**
+   * 元素形状
+   */
   shape: string;
+  /**
+   * 左上角x坐标
+   */
   x: number;
+  /**
+   * 左上角y坐标
+   */
   y: number;
+  /**
+   * 元素宽度
+   */
   width: number;
+  /**
+   * 元素高度
+   */
   height: number;
+  /**
+   * 元素颜色
+   */
   color: string;
+  /**
+   * 元素canvas路径
+   */
   path: Path2D;
+  /**
+   * z轴层级
+   */
   zIndex: number;
+  /**
+   * 元素rect边框信息
+   */
+  ElementRect: {
+    leftTop: { x: number; y: number };
+    rightTop: { x: number; y: number };
+    leftBottom: { x: number; y: number };
+    rightBottom: { x: number; y: number };
+  };
 }
 
 export class PaintElement {
@@ -62,9 +98,38 @@ export class PaintElement {
       this.options.height,
     );
     const zIndex = this.graph.layerIds.length;
-    this.props = { ...this.options, path, zIndex };
+    this.props = new Proxy<ElementProps>(
+      { ...this.options, path, zIndex, ElementRect: this.getElementRect() },
+      {
+        get: (target, prop) => {
+          if (prop === "zIndex") {
+            console.log("proxy get");
+            return this.graph.layerIds.indexOf(target.id);
+          }
+          if (prop === "ElementRect") {
+            return this.getElementRect();
+          }
+          if (Object.hasOwn(target, prop)) {
+            return target[prop as keyof ElementProps];
+          }
+          return undefined;
+        },
+        set: (target, prop, value) => {
+          if (prop === "zIndex") return false;
+          else if (
+            prop in target &&
+            prop !== "zIndex" &&
+            typeof value === typeof target[prop as keyof ElementProps]
+          ) {
+            Reflect.set(target, prop, value);
+            return true;
+          }
+          return false;
+        },
+      },
+    );
     //写入元素合集
-    this.graph.elementsMap.set(defaultOptions.id, this.props);
+    this.graph.elementsMap.set(defaultOptions.id, this);
     this.graph.layerIds.push(defaultOptions.id);
     this.nodeDrag();
   }
@@ -91,26 +156,53 @@ export class PaintElement {
         },
         onMouseup: () => {
           this.canvasElement.style.cursor = "";
-          this.graph.selectionIds.length = 0;
         },
       },
     );
   }
 
-  setProp(propName: Partial<ElementProps>): void;
+  /**
+   * @function 设置元素属性
+   * @param propName 属性名
+   * @param value 属性值
+   * @param needPaint 是否需要重新绘制画布，默认为true
+   */
+  setProp<T extends ElementProps>(
+    propName: Partial<T>,
+    needPaint?: boolean,
+  ): void;
   setProp<T extends keyof ElementProps>(
     propName: T,
     value: ElementProps[T],
+    needPaint?: boolean,
   ): void;
-  setProp<T extends keyof ElementProps>(
-    propName: T | Partial<ElementProps>,
-    value?: ElementProps[T],
+  setProp<T extends ElementProps, D extends keyof ElementProps>(
+    propName: D | Partial<T>,
+    value?: ElementProps[D],
+    needPaint: boolean = true,
   ): void {
     if (typeof propName === "string") {
       this.props[propName] = value!;
     } else {
-      this.props = { ...this.props, ...propName };
+      Object.keys(propName).forEach((key) => {
+        if (key in this.props === false) return;
+        Reflect.set(this.props, key, propName[key as keyof T]);
+      });
     }
+    if (needPaint) this.graph.draw(true);
+  }
+
+  /**
+   * @function 获取元素属性
+   * @param propName 属性名，不传则返回所有属性
+   */
+  getProp(): ElementProps;
+  getProp<T extends keyof ElementProps>(propName: T): ElementProps[T];
+  getProp<T extends keyof ElementProps>(
+    propName?: T,
+  ): ElementProps[T] | ElementProps {
+    if (!propName) return this.props;
+    return this.props[propName];
   }
 
   //#region 判断元素是否被选中
@@ -140,4 +232,19 @@ export class PaintElement {
     return this.ctx2D.isPointInStroke(this.props.path, x, y);
   }
   //#endregion
+
+  /**
+   * @todo 在每个形状中去重写，这里先写一个当作测试用
+   * @description 获取元素的四个顶点坐标,默认为矩形
+   */
+  getElementRect(): ElementProps["ElementRect"] {
+    const { x, y, width, height } = this.props || this.options;
+
+    return {
+      leftTop: { x: x, y: y },
+      rightTop: { x: x + width, y: y },
+      leftBottom: { x: x, y: y + height },
+      rightBottom: { x: x + width, y: y + height },
+    };
+  }
 }
