@@ -150,19 +150,22 @@ export class Selector {
    * @param elId
    * @param type
    */
-  selectElement(elId: string, type: "single" | "multi" = "single") {
+  selectElement(elIds: string[], type: "single" | "multi" = "single") {
+    if (!elIds.length) return;
     const { selectionIds, layerIds } = this.graph;
     if (type === "single") {
       // 单选时只保留层级最高的
-      if (selectionIds.length > 0) {
-        const preElId = selectionIds[0];
-        const currentIndex = layerIds.indexOf(elId);
-        const preIndex = layerIds.indexOf(preElId);
-        selectionIds[0] = currentIndex > preIndex ? elId : preElId;
-      } else {
-        selectionIds.push(elId);
-      }
+      let selectId = elIds[0];
+      elIds.forEach((id) => {
+        if (layerIds.indexOf(id) > layerIds.indexOf(selectId)) {
+          selectId = id;
+        }
+      });
+      selectionIds.push(selectId);
       this.selectCallback.single.forEach((fn) => fn());
+    } else {
+      // todo for multi
+      this.selectCallback.multi.forEach((fn) => fn());
     }
   }
 }

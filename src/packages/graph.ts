@@ -2,7 +2,7 @@ import { getElementTrulySize } from "../utils/dom/elementSize";
 import { Drag } from "./drag";
 
 import type { PaintElement } from "./element";
-import { createSelectELement } from "./select";
+import { createSelectELement, Selector } from "./select";
 import { initWindowEventListener } from "./windowEventListener";
 
 export class Graph {
@@ -26,6 +26,10 @@ export class Graph {
    * 画布平移变换
    */
   coordTranslate = { x: 0, y: 0 };
+  /**
+   * 选择器实例
+   */
+  selectInstance: Selector;
   constructor(container: HTMLElement) {
     if (!container || !(container instanceof HTMLElement)) {
       throw new Error("必须传入一个有效的 HTML 容器元素");
@@ -38,6 +42,7 @@ export class Graph {
     this.createGraph();
     this.graphDrag();
     initWindowEventListener(this);
+    this.selectInstance = new Selector(this);
   }
 
   /**

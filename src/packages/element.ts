@@ -1,7 +1,6 @@
 import { Drag } from "./drag";
 import type { Graph } from "./graph";
 import { v4 as uuidV4 } from "uuid";
-import { selectElement } from "./select";
 
 export interface ElementProps {
   /**
@@ -145,7 +144,6 @@ export class PaintElement {
       {
         onMousedown: () => {
           this.canvasElement.style.cursor = "move";
-          selectElement(this.graph, this.props.id);
         },
         onMousemove: (_e, changeX, changeY) => {
           const isSelected = this.graph.selectionIds.includes(this.props.id);
