@@ -46,6 +46,7 @@
     "vite-plugin-dts": "^4.5.4"
   },
   "dependencies": {
+    "@simonwep/pickr": "^1.9.1",
     "uuid": "^11.1.0"
   }
 }
