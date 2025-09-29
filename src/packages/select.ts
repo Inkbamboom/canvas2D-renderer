@@ -1,40 +1,6 @@
 import type { Graph } from "./graph";
 
 /**
- * 选择之后注册的一些回调函数
- */
-export const selectCallback: (() => void)[] = [];
-
-/**
- * @function 选择元素
- * @param graph 画布实例
- * @param elId 被拾取的元素id
- * @param type 选择类型 single单选 multi多选
- */
-export const selectElement = (
-  graph: Graph,
-  elId: string,
-  type: "single" | "multi" = "single",
-) => {
-  const { selectionIds, layerIds } = graph;
-  if (type === "single") {
-    // 单选时只保留层级最高的
-    if (selectionIds.length > 0) {
-      const preElId = selectionIds[0];
-      const currentIndex = layerIds.indexOf(elId);
-      const preIndex = layerIds.indexOf(preElId);
-      selectionIds[0] = currentIndex > preIndex ? elId : preElId;
-    } else {
-      selectionIds.push(elId);
-    }
-  }
-
-  if (selectionIds.length > 0) {
-    selectCallback.forEach((fn) => fn());
-  }
-};
-
-/**
  * @function 绘制选择框
  */
 export const createSelectELement = (graph: Graph) => {

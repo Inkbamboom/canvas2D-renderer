@@ -1,12 +1,12 @@
 import type { Graph } from "../graph";
 import "@simonwep/pickr/dist/themes/nano.min.css";
 import Pickr from "@simonwep/pickr";
-import { selectCallback } from "../select";
+
 /**
  * @function 创建一个颜色选择器
  * @param container
  * @param graph
- * @description 颜色选择器基于picker
+ * @description 颜色选择器基于pickr
  * https://github.com/Simonwep/pickr
  */
 export const createColorCheck = (container: HTMLElement, graph: Graph) => {
@@ -56,7 +56,7 @@ export const createColorCheck = (container: HTMLElement, graph: Graph) => {
     }
   });
 
-  selectCallback.push(() => {
+  graph.selectInstance.registerSelectCallback("single", () => {
     const { selectionIds, elementsMap } = graph;
     const color = elementsMap.get(selectionIds[0])?.getProp("color");
     if (color) picker.setColor(color);
