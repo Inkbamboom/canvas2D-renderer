@@ -1,5 +1,5 @@
-import { Drag } from "./drag";
-import type { Graph } from "./graph";
+import { Drag } from "../drag";
+import type { Graph } from "../graph";
 import { v4 as uuidV4 } from "uuid";
 
 export interface ElementProps {
@@ -63,11 +63,11 @@ export class PaintElement {
     color: string;
   };
   graph: Graph;
-  private props: ElementProps;
-  constructor(
+  protected props: ElementProps;
+  protected constructor(
     graph: Graph,
     options?: {
-      shape?: string;
+      shape: string;
       x: number;
       y: number;
       width: number;
@@ -89,16 +89,14 @@ export class PaintElement {
     this.options = { ...defaultOptions, ...options };
     this.canvasElement = this.graph.graphElement;
     this.ctx2D = this.graph.graphContext;
-    const path = new Path2D();
-    path.rect(
-      this.options.x,
-      this.options.y,
-      this.options.width,
-      this.options.height,
-    );
     const zIndex = this.graph.layerIds.length;
     this.props = new Proxy<ElementProps>(
-      { ...this.options, path, zIndex, ElementRect: this.getElementRect() },
+      {
+        ...this.options,
+        path: new Path2D(),
+        zIndex,
+        ElementRect: this.getElementRect(),
+      },
       {
         get: (target, prop) => {
           if (prop === "zIndex") {
@@ -233,11 +231,11 @@ export class PaintElement {
 
   /**
    * @todo 在每个形状中去重写，这里先写一个当作测试用
-   * @description 获取元素的四个顶点坐标,默认为矩形
+   * @description 获取包裹元素矩形框的四个顶点坐标,默认为矩形
+   * @description 后续的碰撞检测和选择等都有用
    */
   getElementRect(): ElementProps["ElementRect"] {
     const { x, y, width, height } = this.props || this.options;
-
     return {
       leftTop: { x: x, y: y },
       rightTop: { x: x + width, y: y },

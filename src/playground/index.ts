@@ -2,7 +2,7 @@ import "../packages/main";
 import "./style.css";
 import {
   Graph,
-  PaintElement,
+  RectElement,
   changeZIndex,
   createColorCheck,
 } from "../packages/main";
@@ -15,8 +15,8 @@ container?.appendChild(tools);
 // 创建画布实例
 const graphInstance = new Graph(container!);
 createColorCheck(tools, graphInstance);
-const node1 = new PaintElement(graphInstance);
-new PaintElement(graphInstance, {
+const node1 = new RectElement(graphInstance);
+new RectElement(graphInstance, {
   x: 200,
   y: 200,
   width: 100,
@@ -29,3 +29,13 @@ setTimeout(() => {
   changeZIndex(graphInstance, node1.options.id, "up");
   graphInstance.draw(true);
 }, 2000);
+
+// for (let i = 0; i < 10000; i++) {
+//   new RectElement(graphInstance, {
+//     x: Math.floor(Math.random() * graphInstance.graphElement.width - 200),
+//     y: Math.floor(Math.random() * graphInstance.graphElement.height - 200),
+//     width: 200,
+//     height: 200,
+//     color: `rgba(${Math.floor(Math.random() * 256)},${Math.floor(Math.random() * 256)},${Math.floor(Math.random() * 256)})`,
+//   });
+// }

@@ -1,8 +1,8 @@
 import { getElementTrulySize } from "../utils/dom/elementSize";
 import { Drag } from "./drag";
 
-import type { PaintElement } from "./element";
-import { createSelectELement, Selector } from "./select";
+import type { PaintElement } from "./elements/element";
+import { Selector } from "./select";
 import { initWindowEventListener } from "./windowEventListener";
 
 export class Graph {
@@ -128,7 +128,7 @@ export class Graph {
     });
     // 为了保证选择框始终在最上层，因此放在最后绘制
     if (this.selectionIds.length > 0) {
-      createSelectELement(this);
+      this.selectInstance.drawSelect();
     }
   }
 

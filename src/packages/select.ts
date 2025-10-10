@@ -1,71 +1,5 @@
 import type { Graph } from "./graph";
 
-/**
- * @function 绘制选择框
- */
-export const createSelectELement = (graph: Graph) => {
-  const { graphContext, selectionIds, elementsMap } = graph;
-  const selectEl = elementsMap.get(selectionIds[0])!;
-  const { leftTop, leftBottom, rightTop, rightBottom } =
-    selectEl.getProp("ElementRect");
-  graphContext.beginPath();
-  const rectWidth = 8;
-  const extraWidth = rectWidth / 2;
-  const leftTopPosition = {
-    x: leftTop.x - extraWidth,
-    y: leftTop.y - extraWidth,
-  };
-  const rightTopPosition = {
-    x: rightTop.x + extraWidth,
-    y: rightTop.y - extraWidth,
-  };
-  const leftBottomPosition = {
-    x: leftBottom.x - extraWidth,
-    y: leftBottom.y + extraWidth,
-  };
-  const rightBottomPosition = {
-    x: rightBottom.x + extraWidth,
-    y: rightBottom.y + extraWidth,
-  };
-  graphContext.moveTo(leftTopPosition.x, leftTopPosition.y);
-  graphContext.lineTo(rightTopPosition.x, rightTopPosition.y);
-  graphContext.lineTo(rightBottomPosition.x, rightBottomPosition.y);
-  graphContext.lineTo(leftBottomPosition.x, leftBottomPosition.y);
-  graphContext.closePath();
-  graphContext.lineWidth = 1;
-  graphContext.strokeStyle = "rgba(0, 120, 215, 1)";
-  graphContext.stroke();
-  const path = new Path2D();
-
-  path.rect(
-    leftTopPosition.x - rectWidth / 2,
-    leftTopPosition.y - rectWidth / 2,
-    rectWidth,
-    rectWidth,
-  );
-  path.rect(
-    rightTopPosition.x - rectWidth / 2,
-    rightTopPosition.y - rectWidth / 2,
-    rectWidth,
-    rectWidth,
-  );
-  path.rect(
-    rightBottomPosition.x - rectWidth / 2,
-    rightBottomPosition.y - rectWidth / 2,
-    rectWidth,
-    rectWidth,
-  );
-  path.rect(
-    leftBottomPosition.x - rectWidth / 2,
-    leftBottomPosition.y - rectWidth / 2,
-    rectWidth,
-    rectWidth,
-  );
-  graphContext.fillStyle = "#ffffff";
-  graphContext.fill(path);
-  graphContext.stroke(path);
-};
-
 export class Selector {
   graph: Graph;
   private selectCallback: {
@@ -133,5 +67,68 @@ export class Selector {
       // todo for multi
       this.selectCallback.multi.forEach((fn) => fn());
     }
+  }
+
+  drawSelect() {
+    const { graphContext, selectionIds, elementsMap } = this.graph;
+    const selectEl = elementsMap.get(selectionIds[0])!;
+    const { leftTop, leftBottom, rightTop, rightBottom } =
+      selectEl.getProp("ElementRect");
+    graphContext.beginPath();
+    const rectWidth = 8;
+    const extraWidth = rectWidth / 2;
+    const leftTopPosition = {
+      x: leftTop.x - extraWidth,
+      y: leftTop.y - extraWidth,
+    };
+    const rightTopPosition = {
+      x: rightTop.x + extraWidth,
+      y: rightTop.y - extraWidth,
+    };
+    const leftBottomPosition = {
+      x: leftBottom.x - extraWidth,
+      y: leftBottom.y + extraWidth,
+    };
+    const rightBottomPosition = {
+      x: rightBottom.x + extraWidth,
+      y: rightBottom.y + extraWidth,
+    };
+    graphContext.moveTo(leftTopPosition.x, leftTopPosition.y);
+    graphContext.lineTo(rightTopPosition.x, rightTopPosition.y);
+    graphContext.lineTo(rightBottomPosition.x, rightBottomPosition.y);
+    graphContext.lineTo(leftBottomPosition.x, leftBottomPosition.y);
+    graphContext.closePath();
+    graphContext.lineWidth = 1;
+    graphContext.strokeStyle = "rgba(0, 120, 215, 1)";
+    graphContext.stroke();
+    const path = new Path2D();
+
+    path.rect(
+      leftTopPosition.x - rectWidth / 2,
+      leftTopPosition.y - rectWidth / 2,
+      rectWidth,
+      rectWidth,
+    );
+    path.rect(
+      rightTopPosition.x - rectWidth / 2,
+      rightTopPosition.y - rectWidth / 2,
+      rectWidth,
+      rectWidth,
+    );
+    path.rect(
+      rightBottomPosition.x - rectWidth / 2,
+      rightBottomPosition.y - rectWidth / 2,
+      rectWidth,
+      rectWidth,
+    );
+    path.rect(
+      leftBottomPosition.x - rectWidth / 2,
+      leftBottomPosition.y - rectWidth / 2,
+      rectWidth,
+      rectWidth,
+    );
+    graphContext.fillStyle = "#ffffff";
+    graphContext.fill(path);
+    graphContext.stroke(path);
   }
 }
