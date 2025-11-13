@@ -1,3 +1,4 @@
+import { CommonELementsDrag } from "./elements/drag";
 import type { Graph } from "./graph";
 
 type NormalCallbackFn = (...args: any[]) => void;
@@ -15,43 +16,42 @@ export const mouseupFnCollection: NormalCallbackFn[] = []; // 鼠标松开事件
  * @param graph
  */
 export const initWindowEventListener = (graph: Graph) => {
+  let dragInstance: CommonELementsDrag;
+  // 初始化拖拽
+  dragInstance = new CommonELementsDrag();
   window.addEventListener("mousedown", (e) => {
-    const { elementsMap, selectionIds, graphElement } = graph;
+    const { elementsMap, graphElement } = graph;
     if (e.target !== graphElement) return;
     const mouseX = e.clientX;
     const mouseY = e.clientY;
-    let isClickOnElement = false;
     /**
      * 符合被点击的元素的id数组
      */
     const pickElementIds: string[] = [];
     elementsMap.forEach((el) => {
       if (el.isInPath(mouseX, mouseY) || el.isInStroke(mouseX, mouseY)) {
-        // 在首次判定到点击元素的时候意味着重新进行了选择逻辑因此需要情况原本的选择列表
-        if (!isClickOnElement) {
-          isClickOnElement = true;
-          selectionIds.length = 0;
-        }
         pickElementIds.push(el.getProp("id"));
-      } else {
-        // 如果点击的不是元素，也需要清空选择
-        selectionIds.length = 0;
       }
     });
     graph.selectInstance.selectElement(pickElementIds);
+    // 获取拖拽的元素
+    dragInstance.setDragEl(elementsMap.get(graph.selectionIds[0]));
+    dragInstance.onmousedown(e);
     mousedownFnCollection.forEach((fn) => {
       fn(e);
     });
-    graph.draw(true);
+    // graph.draw(true);
   });
 
   window.addEventListener("mousemove", (e) => {
+    dragInstance.onmousemove(e);
     mousemoveFnCollection.forEach((fn) => {
       fn(e);
     });
   });
 
   window.addEventListener("mouseup", (e) => {
+    dragInstance.onmouseup();
     mouseupFnCollection.forEach((fn) => {
       fn(e);
     });

@@ -51,9 +51,15 @@ export class Selector {
    * @param type
    */
   selectElement(elIds: string[], type: "single" | "multi" = "single") {
-    if (!elIds.length) return;
     const { selectionIds, layerIds } = this.graph;
+    if (!elIds.length) {
+      // 清空逻辑不一定是在elIds为空的情况触发的，这里先简单做一下
+      this.clearSelection();
+      return;
+    }
     if (type === "single") {
+      // 单选状态下每次触发选择都需要清空原有的选择列表
+      this.clearSelection();
       // 单选时只保留层级最高的
       let selectId = elIds[0];
       elIds.forEach((id) => {
@@ -67,6 +73,11 @@ export class Selector {
       // todo for multi
       this.selectCallback.multi.forEach((fn) => fn());
     }
+  }
+
+  clearSelection() {
+    const { selectionIds } = this.graph;
+    selectionIds.length = 0;
   }
 
   drawSelect() {

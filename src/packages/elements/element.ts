@@ -1,4 +1,3 @@
-import { Drag } from "../drag";
 import type { Graph } from "../graph";
 import { v4 as uuidV4 } from "uuid";
 
@@ -128,33 +127,6 @@ export class PaintElement {
     //写入元素合集
     this.graph.elementsMap.set(defaultOptions.id, this);
     this.graph.layerIds.push(defaultOptions.id);
-    this.nodeDrag();
-  }
-
-  nodeDrag() {
-    new Drag(
-      this.canvasElement,
-      (e) => {
-        if (e.button !== 0 || !this.isInPath(e.clientX, e.clientY))
-          return false; // 只处理鼠标左键
-        return true; // 触发拖拽
-      },
-      {
-        onMousedown: () => {
-          this.canvasElement.style.cursor = "move";
-        },
-        onMousemove: (_e, changeX, changeY) => {
-          const isSelected = this.graph.selectionIds.includes(this.props.id);
-          if (!isSelected) return;
-          this.props.x += changeX;
-          this.props.y += changeY;
-          this.graph.draw(true);
-        },
-        onMouseup: () => {
-          this.canvasElement.style.cursor = "";
-        },
-      },
-    );
   }
 
   /**
