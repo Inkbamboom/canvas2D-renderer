@@ -36,6 +36,7 @@ export const initWindowEventListener = (graph: Graph) => {
     graph.selectInstance.selectElement(pickElementIds);
     // 获取拖拽的元素
     dragInstance.setDragEl(elementsMap.get(graph.selectionIds[0]));
+    // dragInstance.setDragEl(document.getElementById("app")!);
     dragInstance.onmousedown(e);
     mousedownFnCollection.forEach((fn) => {
       fn(e);
