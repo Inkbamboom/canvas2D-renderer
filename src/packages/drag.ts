@@ -1,3 +1,5 @@
+// import type { PaintElement } from "./elements/element";
+// import type { Graph } from "./graph";
 import {
   mousedownFnCollection,
   mousemoveFnCollection,

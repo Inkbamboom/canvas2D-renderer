@@ -30,12 +30,12 @@ setTimeout(() => {
   graphInstance.draw(true);
 }, 2000);
 
-// for (let i = 0; i < 10000; i++) {
-//   new RectElement(graphInstance, {
-//     x: Math.floor(Math.random() * graphInstance.graphElement.width - 200),
-//     y: Math.floor(Math.random() * graphInstance.graphElement.height - 200),
-//     width: 200,
-//     height: 200,
-//     color: `rgba(${Math.floor(Math.random() * 256)},${Math.floor(Math.random() * 256)},${Math.floor(Math.random() * 256)})`,
-//   });
-// }
+for (let i = 0; i < 0; i++) {
+  new RectElement(graphInstance, {
+    x: Math.floor(Math.random() * graphInstance.graphElement.width - 200),
+    y: Math.floor(Math.random() * graphInstance.graphElement.height - 200),
+    width: 200,
+    height: 200,
+    color: `rgba(${Math.floor(Math.random() * 256)},${Math.floor(Math.random() * 256)},${Math.floor(Math.random() * 256)})`,
+  });
+}

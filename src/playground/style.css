@@ -42,3 +42,12 @@ canvas {
   border: none;
   display: block;
 }
+
+#app {
+  /* position: absolute;
+  width: 20px;
+  height: 20px;
+  background-color: green;
+  top: 100px;
+  left: 100px; */
+}
